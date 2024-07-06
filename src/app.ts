@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
 import { usersRouter } from './routes/user.routes';
 import { ErrorClient } from './utils/errorClient';
