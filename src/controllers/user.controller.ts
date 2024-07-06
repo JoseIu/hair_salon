@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { prisma } from '../config/conectDb';
+import { catchError } from '../utils/catchError';
 
 const userLogin = async (req: Request, res: Response) => {
   res.send('User login');
@@ -23,4 +24,7 @@ const userRegister = async (req: Request, res: Response) => {
   res.json(newUser);
 };
 
-export { userLogin, userRegister };
+export default {
+  userLogin: catchError(userLogin),
+  userRegister: catchError(userRegister)
+};
