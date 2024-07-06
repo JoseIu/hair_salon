@@ -1,14 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import { ZodError } from 'zod';
+import { ErrorClient } from '../../../utils/errorClient';
 import { registerSchema } from './registerSchema';
 
 export const registerDTO = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const result = registerSchema.parse(req.body);
-    next();
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ message: error.errors[0].message });
-    }
-  }
+  const isValidDTO = registerSchema.safeParse(req.body);
+  const messageError = isValidDTO.error?.errors.map(error => error.message).join(', ');
+
+  if (!isValidDTO.success) throw new ErrorClient(messageError!, 400);
+  next();
 };
