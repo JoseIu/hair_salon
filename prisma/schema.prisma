@@ -15,10 +15,10 @@ datasource db {
 
 model User {
   user_id   Int      @id @default(autoincrement())
-  name      String   @db.Char(255)
-  email     String   @unique @db.Char(50)
-  password  String   @db.Char(100)
-  phone     String   @db.Char(15)
+  name      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(50)
+  password  String   @db.VarChar(100)
+  phone     String   @db.VarChar(15)
   createdAt DateTime @default(now())
   date      Date[]
 }
@@ -32,7 +32,7 @@ model Date {
 
 model Service {
   service_id Int    @id @default(autoincrement())
-  name       String @db.Char(200)
+  name       String @db.VarChar(200)
   price      Int
 
   date    Date @relation(fields: [date_id], references: [date_id])
