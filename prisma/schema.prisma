@@ -24,10 +24,21 @@ model User {
 }
 
 model Date {
-  date_id Int       @id @default(autoincrement())
-  user    User      @relation(fields: [user_id], references: [user_id])
-  user_id Int       @unique
-  serive  Service[]
+  date_id    Int            @id @default(autoincrement())
+  date_quote DateTime
+  user_id    Int
+  user       User           @relation(fields: [user_id], references: [user_id])
+  serive     Date_service[]
+}
+
+model Date_service {
+  date_id Int
+  date    Date @relation(fields: [date_id], references: [date_id], onDelete: Cascade)
+
+  service_id Int
+  service    Service @relation(fields: [service_id], references: [service_id])
+
+  @@id([date_id, service_id])
 }
 
 model Service {
@@ -35,6 +46,5 @@ model Service {
   name       String @db.VarChar(200)
   price      Int
 
-  date    Date @relation(fields: [date_id], references: [date_id])
-  date_id Int
+  dates Date_service[]
 }
