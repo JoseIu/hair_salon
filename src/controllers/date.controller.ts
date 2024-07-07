@@ -47,8 +47,31 @@ const createNewDate = async (req: Request, res: Response) => {
   return res.status(201).json({ error: false, data: newDate, services: dateServicesEntries });
 };
 
+const getMyDates = async (req: Request, res: Response) => {
+  const { userAuth } = req.body;
+  const dates = await prisma.date.findMany({
+    where: {
+      user_id: userAuth.user_id
+    },
+    include: {
+      serive: {
+        include: {
+          service: true
+        }
+      }
+    }
+  });
+
+  const formatDates = dates.map(date => ({
+    ...date,
+    serive: date.serive.map(ds => ds.service.name)
+  }));
+  return responseClient(res, 200, formatDates);
+};
+
 export default {
   getAllDates: catchError(getAllDates),
 
-  createNewDate: catchError(createNewDate)
+  createNewDate: catchError(createNewDate),
+  getMyDates: catchError(getMyDates)
 };
