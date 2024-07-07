@@ -7,6 +7,7 @@ import { catchError } from '../utils/catchError';
 import { ErrorClient } from '../utils/errorClient';
 import { responseClient } from '../utils/responseClient';
 const SECRET_KEY = process.env.SECRET_KEY;
+
 const userLogin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 

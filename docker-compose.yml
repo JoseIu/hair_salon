@@ -1,4 +1,3 @@
-
 services:
   myDB:
     image: postgres:15.3
