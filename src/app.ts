@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
 import { dateRoute } from './routes/date.routes';
+import { noRoutes } from './routes/noRoutes.routes';
 import { usersRouter } from './routes/user.routes';
 import { ErrorClient } from './utils/errorClient';
 
@@ -11,6 +12,7 @@ expressApp.use(express.text());
 
 expressApp.use(usersRouter);
 expressApp.use(dateRoute);
+expressApp.use(noRoutes);
 
 expressApp.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ErrorClient) {
