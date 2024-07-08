@@ -62,14 +62,27 @@ const createNewDate = async (req: Request, res: Response) => {
   // get the dateID created
   const date_id = newDate.date_id;
 
-  const services = await prisma.date_service.createMany({
+  await prisma.date_service.createMany({
     data: service_id.map((service_id: number) => ({
       date_id,
       service_id
     }))
   });
 
-  return responseClient(res, 201, { ...newDate, services });
+  const services = await prisma.date_service.findMany({
+    where: { date_id },
+    include: {
+      service: true
+    }
+  });
+
+  const formatDates = {
+    ...newDate,
+    date_quote: new Date(newDate.date_quote).toLocaleString(),
+    services: services.map(ds => ds.service.name)
+  };
+
+  return responseClient(res, 201, formatDates);
 };
 
 const updateDate = async (req: Request, res: Response) => {
@@ -78,7 +91,7 @@ const updateDate = async (req: Request, res: Response) => {
 
   const { date_quote, service_id, userAuth } = req.body;
 
-  const { updateDate, dateServicesEntries } = await prisma.$transaction(async () => {
+  const { updateDate } = await prisma.$transaction(async () => {
     const updateDate = await prisma.date.update({
       where: { date_id: dateIdToNumber },
       data: {
@@ -91,17 +104,29 @@ const updateDate = async (req: Request, res: Response) => {
       where: { date_id: dateIdToNumber }
     });
 
-    const dateServicesEntries = await prisma.date_service.createMany({
+    await prisma.date_service.createMany({
       data: service_id.map((service_id: number) => ({
         date_id: dateIdToNumber,
         service_id
       }))
     });
 
-    return { updateDate, dateServicesEntries };
+    return { updateDate };
+  });
+  const services = await prisma.date_service.findMany({
+    where: { date_id: dateIdToNumber },
+    include: {
+      service: true
+    }
   });
 
-  return responseClient(res, 200, { ...updateDate, services: dateServicesEntries });
+  const formatDates = {
+    ...updateDate,
+    date_quote: new Date(updateDate.date_quote).toLocaleString(),
+    services: services.map(ds => ds.service.name)
+  };
+
+  return responseClient(res, 200, formatDates);
 };
 
 export default {
