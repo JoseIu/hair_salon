@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { Request, Response } from 'express';
 import { prisma } from '../config/conectDb';
 import { catchError } from '../utils/catchError';
@@ -6,6 +7,7 @@ import { responseClient } from '../utils/responseClient';
 const getAllDates = async (req: Request, res: Response) => {
   const dates = await prisma.date.findMany({
     include: {
+      user: true,
       serive: {
         include: {
           service: true
@@ -14,10 +16,11 @@ const getAllDates = async (req: Request, res: Response) => {
     }
   });
   const formattDates = dates.map(date => ({
+    user: date.user,
     date_id: date.date_id,
-    date_quote: new Date(date.date_quote).toLocaleString(),
+    date_quote: format(date.date_quote, "yyyy-MM-dd'T'HH:mm"),
     user_id: date.user_id,
-    services: date.serive.map(ds => ds.service.name)
+    service: date.serive.map(ds => ds.service.name)
   }));
 
   return responseClient(res, 200, formattDates);
@@ -40,7 +43,7 @@ const getMyDates = async (req: Request, res: Response) => {
 
   const formatDates = dates.map(date => ({
     ...date,
-    date_quote: new Date(date.date_quote).toLocaleString(),
+    date_quote: format(date.date_quote, "yyyy-MM-dd'T'HH:mm"),
     serive: date.serive.map(ds => ds.service.name)
   }));
   return responseClient(res, 200, formatDates);
@@ -49,8 +52,6 @@ const getMyDates = async (req: Request, res: Response) => {
 //CRUD
 const createNewDate = async (req: Request, res: Response) => {
   const { date_quote, user_id, service_id } = req.body;
-
-  console.log({ date_quote: new Date(date_quote).toISOString() });
 
   const newDate = await prisma.date.create({
     data: {
@@ -78,7 +79,7 @@ const createNewDate = async (req: Request, res: Response) => {
 
   const formatDates = {
     ...newDate,
-    date_quote: new Date(newDate.date_quote).toLocaleString(),
+    date_quote: format(date_quote, "yyyy-MM-dd'T'HH:mm"),
     services: services.map(ds => ds.service.name)
   };
 
